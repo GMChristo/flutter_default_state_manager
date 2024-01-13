@@ -5,18 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_default_state_manager/widgets/imc_gauge.dart';
 import 'package:intl/intl.dart';
 
-class Template extends StatefulWidget {
-  const Template({super.key});
+class ValueNotifierPage extends StatefulWidget {
+  const ValueNotifierPage({super.key});
 
   @override
-  State<Template> createState() => _TemplateState();
+  State<ValueNotifierPage> createState() => _ValueNotifierPageState();
 }
 
-class _TemplateState extends State<Template> {
+class _ValueNotifierPageState extends State<ValueNotifierPage> {
   final pesoEC = TextEditingController();
   final alturaEC = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  var imc = 0.0;
+  var imc = ValueNotifier(0.0);
 
   @override
   void dispose() {
@@ -29,13 +29,11 @@ class _TemplateState extends State<Template> {
     required double peso,
     required double altura,
   }) async {
-    setState(() {
-      imc = 0;
-    });
+    imc.value = 0;
+
     await Future.delayed(const Duration(seconds: 1));
-    setState(() {
-      imc = peso / pow(altura, 2);
-    });
+
+    imc.value = peso / pow(altura, 2);
   }
 
   @override
@@ -51,7 +49,12 @@ class _TemplateState extends State<Template> {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                ImcGauge(imc: imc),
+                ValueListenableBuilder<double>(
+                  valueListenable: imc,
+                  builder: (_, imcValue, __) {
+                    return ImcGauge(imc: imcValue);
+                  },
+                ),
                 const SizedBox(
                   height: 20,
                 ),
